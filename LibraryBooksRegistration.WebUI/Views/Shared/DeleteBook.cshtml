@@ -1,0 +1,49 @@
+﻿@model LibraryBooksRegistration.Domain.Entities.Book
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@ViewBag.Title - My ASP.NET Application</title>
+@*@Styles.Render("~/Content/themes/base/all.css")*@
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/Content/kendo/css")
+@Scripts.Render("~/bundles/jquery")
+@*@Scripts.Render("~/bundles/jqueryui")*@
+@Scripts.Render("~/bundles/kendo")
+
+<div class="container">
+    @Html.Partial("Messages")
+    @using (Ajax.BeginForm("DeleteBook", "BookCatalog", new AjaxOptions { HttpMethod = "POST" }))
+    {
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(m => m.ID)
+        <h3>ნამდვილად გსურთ ჩანაწერის წაშლა?</h3>
+        <table>
+            <tr>
+                <td>
+                    <a class="btn btn-default" style="margin-right:10px" id="CloseWindowButton"><span class="glyphicon glyphicon-circle-arrow-left"></span> არა</a>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="glyphicon glyphicon-save"></i> დიახ
+                    </button>
+                </td>
+            </tr>
+        </table>
+    }
+</div>
+
+<script>
+    $(document).ready(function () {
+        var v = '@ViewBag.SubmitedSuccessful';
+        if(v){
+            window.parent.$("#DeleteBookPopUpWindow").data("kendoWindow").close();
+            var grid = window.parent.$("#BooksGrid").data("kendoGrid");
+            grid.dataSource.read();
+        }
+    })
+    $("#CloseWindowButton").on("click", function (e) {
+        window.parent.$("#DeleteBookPopUpWindow").data("kendoWindow").close();
+    })
+</script>
+@Scripts.Render("~/bundles/bootstrap")

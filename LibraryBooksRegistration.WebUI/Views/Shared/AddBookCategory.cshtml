@@ -1,0 +1,64 @@
+﻿@model LibraryBooksRegistration.Domain.Entities.BookCategory
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+@*@Styles.Render("~/Content/themes/base/all.css")*@
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/Content/kendo/css")
+@Scripts.Render("~/bundles/jquery")
+@*@Scripts.Render("~/bundles/jqueryui")*@
+@Scripts.Render("~/bundles/kendo")
+
+<div class="container">
+    @Html.Partial("Messages")
+@using (Ajax.BeginForm("AddBookCategory", "BookCategoryCatalog", new AjaxOptions { HttpMethod = "POST"}))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(m => m.ID)
+    @Html.HiddenFor(m=>m.ParentCategoryID)
+    <div class="form-group">
+        <label>@Html.DisplayNameFor(m => m.Name):</label><br />
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control"})
+        @Html.ValidationMessageFor(m => m.Name)
+        <br />
+        <label>@Html.DisplayNameFor(m => m.Description):</label><br />
+        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", @rows="5" })
+        @Html.ValidationMessageFor(m => m.Description)
+    </div>
+    <table>
+        <tr>
+            <td>
+                <a class="btn btn-default" style="margin-right:10px" id="CloseWindowButton"><span class="glyphicon glyphicon-circle-arrow-left"></span> დახურვა</a>
+            </td>
+            <td>
+                <button type="submit" class="btn btn-primary">
+                    <i class="glyphicon glyphicon-save"></i> შენახვა
+                </button>
+            </td>
+        </tr>
+    </table>
+}
+</div>
+
+<script>
+    //$("#CloseWindowButton").click(function () {
+    //    // call 'close' method on nearest kendoWindow
+    //    $(this).closest("[data-role=window]").data("kendoWindow").close();
+    //    // the above is equivalent to:
+    //    //$(this).closest(".k-window-content").data("kendoWindow").close();
+    //});
+    $(document).ready(function () {
+        var v = '@ViewBag.SubmitedSuccessful';
+        if(v){
+            window.parent.$("#AddBookCategoryPopUpWindow").data("kendoWindow").close();
+            var tree = window.parent.$("#BookCategoriesTreeView").data("kendoTreeView");
+            tree.dataSource.read();
+        }
+    })
+    $("#CloseWindowButton").on("click", function (e) {
+        window.parent.$("#AddBookCategoryPopUpWindow").data("kendoWindow").close();
+    })
+</script>
+@Scripts.Render("~/bundles/bootstrap")
+

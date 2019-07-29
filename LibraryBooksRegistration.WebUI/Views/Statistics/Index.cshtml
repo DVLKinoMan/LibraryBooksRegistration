@@ -1,0 +1,30 @@
+﻿@model IEnumerable<LibraryBooksRegistration.WebUI.Models.BookCategoryStatistic>
+
+@{
+    ViewBag.Title = "სტატისტიკური მოდული";
+}
+
+<h2>წიგნის კატეგორიების სტატისტიკა:</h2>
+<table class="table table-hover">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.path)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BooksQuantity)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.path)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.BooksQuantity)
+        </td>
+    </tr>
+}
+
+</table>

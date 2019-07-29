@@ -1,0 +1,128 @@
+﻿@*@model IEnumerable<LibraryBooksRegistration.WebUI.Models.BookViewModel>*@
+@{
+    ViewBag.Title = "წიგნების კატალოგი";
+}
+
+@(Html.Kendo().Grid<LibraryBooksRegistration.WebUI.Models.BookViewModel>()
+            .Name("BooksGrid")
+            .Columns(c =>
+            {
+                c.Bound(b => b.ID).Hidden();
+                c.Bound(b => b.Name);
+                c.Bound(b => b.CategoryName);
+                c.Bound(b => b.PublishingHouse);
+                c.Bound(b => b.PublishingDate).Format("{0:MM/dd/yyyy}");
+                c.Bound(b => b.BookAuthors);
+            }
+            )
+            .DataSource(datasource=>datasource
+                .Ajax()
+                .PageSize(10)
+                .Read(read => read.Action("Books_Read", "BookCatalog"))
+                .Model(model=>
+                {
+                    model.Id(b => b.ID);
+                }
+                )
+            //.Create(create => create.Action("AddBoook", "BookCatalog"))
+            )
+            .Sortable()
+            .Pageable()
+            .Selectable(select=>select.Mode(GridSelectionMode.Single))
+            .ToolBar(t =>
+            {
+                t.Custom().Text("წიგნის დამატება").HtmlAttributes(new { @class = "k-button k-button-icontext k-grid-add", @id = "OpenAddBookPopUp",@href="#" });
+                t.Custom().Text("რედაქტირება ").HtmlAttributes(new { @class = "pull-right", @id = "OpenEditBookPopUp", @href = "#" });
+                t.Custom().Text("წაშლა ").HtmlAttributes(new { @class = "pull-right", @id = "OpenDeleteBookPopUp", @href = "#" });
+            })
+)
+
+@(Html.Kendo().Window()
+        .Name("AddBookPopUpWindow")
+        .Visible(false)
+        .Modal(true)
+        .Width(600)
+        .Height(500)
+        .Title("წიგნის დამატება")
+        .LoadContentFrom("AddBook", "BookCatalog")
+        .Iframe(true)
+        .Resizable()
+        .Draggable()
+)
+@(Html.Kendo().Window()
+       .Name("EditBookPopUpWindow")
+       .Visible(false)
+       .Modal(true)
+       .Width(600)
+       .Height(500)
+       .Title("წიგნის რედაქტირება")
+       .LoadContentFrom("EditBook", "BookCatalog")
+       .Iframe(true)
+       .Resizable()
+       .Draggable()
+)
+@(Html.Kendo().Window()
+       .Name("DeleteBookPopUpWindow")
+       .Visible(false)
+       .Modal(true)
+       .Width(300)
+       .Height(250)
+       .Title("წიგნის წაშლა")
+       .LoadContentFrom("DeleteBook", "BookCatalog")
+       .Iframe(true)
+       .Resizable()
+)
+<script>
+    $(document).ready(function () {
+        var editb = document.getElementById("OpenEditBookPopUp");
+        var delb = document.getElementById("OpenDeleteBookPopUp");
+        
+        var sp = document.createElement("span");
+        var sp2 = document.createElement("span");
+
+        sp.className = "glyphicon glyphicon-trash";
+        delb.appendChild(sp);
+        sp2.className = "glyphicon glyphicon-pencil";
+        editb.appendChild(sp2);
+    });
+    $("#OpenAddBookPopUp").on("click", function (e) {
+        var win = $("#AddBookPopUpWindow").data("kendoWindow");
+        win.refresh();
+        win.center().open();
+    })
+    $("#OpenEditBookPopUp").on("click", function (e) {
+        var win = $("#EditBookPopUpWindow").data("kendoWindow");
+        var grid = $('#BooksGrid').data('kendoGrid');
+
+        var item = grid.dataItem(grid.select());
+
+        if (item && item.ID)
+        {
+            var bookid = item.ID;
+            if (item.ID > 0) {
+                var url1 = '@Url.Action("EditBook", "BookCatalog", new { bookid = "BookID" })';
+                win.refresh({
+                    url: url1.replace("BookID",bookid)
+                });
+                win.center().open();
+            }
+        }
+    })
+    $("#OpenDeleteBookPopUp").on("click", function (e) {
+        var win = $("#DeleteBookPopUpWindow").data("kendoWindow");
+        var grid = $('#BooksGrid').data('kendoGrid');
+
+        var item = grid.dataItem(grid.select());
+
+        if (item && item.ID) {
+            var bookid = item.ID;
+            if (item.ID > 0) {
+                var url1 = '@Url.Action("DeleteBook", "BookCatalog", new { bookid = "BookID" })';
+                win.refresh({
+                    url: url1.replace("BookID", bookid)
+                });
+                win.center().open();
+            }
+        }
+    })
+</script>

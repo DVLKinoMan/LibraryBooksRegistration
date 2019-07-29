@@ -1,0 +1,89 @@
+﻿@model IEnumerable<LibraryBooksRegistration.WebUI.Models.AuthorViewModel>
+@{
+    ViewBag.Title = "ავტორების კატალოგი";
+}
+
+@*@Html.Partial("Messages")*@
+
+   @Html.Kendo().Grid(Model).Name("AuthorsGrid").Columns(
+    c =>
+    {
+        c.Bound(a => a.ID).Hidden();
+        c.Bound(a => a.FirstName);
+        c.Bound(a => a.LastName);
+        c.Bound(a => a.BirthDate).Format("{0:MM/dd/yyyy}");
+        //c.Command(command =>
+        //{
+        //    command.Edit().UpdateText("შენახვა").CancelText("დახურვა").Text("რედაქტირება");
+        //    command.Destroy().Text("წაშლა");
+        //}).Width(200);
+    }).Sortable().Pageable().Selectable(
+            selectable => selectable.Mode(GridSelectionMode.Single)
+        ).DataSource(dataSource =>
+                dataSource.Ajax()
+                //.ServerOperation(false)
+                .PageSize(15)
+                .Events(e => e.Error("error_handler"))
+                .Model(model =>
+                {
+                    model.Id(a => a.ID);
+                    model.Field(author => author.ID).Editable(false);
+                })
+                .Create(create => create.Action("AddAuthor", "AuthorCatalog"))
+                .Update(update => update.Action("EditAuthor", "AuthorCatalog"))
+                .Destroy(delete => delete.Action("DeleteAuthor", "AuthorCatalog"))
+                ).Editable(editable =>
+                    editable.CancelDelete("არა").ConfirmDelete("დიახ").DisplayDeleteConfirmation("ნამდვილად გსურთ ჩანაწერის წაშლა?")
+                ).Events(e => e.Edit("HideUnwantedFields")).Editable(editable => editable.Mode(GridEditMode.PopUp)).ToolBar(t =>
+                {
+                    t.Create().Text("ახალი ავტორის დამატება");
+                    t.Custom().Text("რედაქტირება ").HtmlAttributes(new { @class = "pull-right", @id = "CustomEditButton", @onclick = "EditSelectedRow()", @href = "#" });
+                    t.Custom().Text("წაშლა ").HtmlAttributes(new { @class = "pull-right", @id = "CustomDeleteButton", @onclick = "DeleteSelectedRow()", @href = "#" });
+                })
+
+
+<script>
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+    function HideUnwantedFields(e) {
+        $("#FullName").hide();
+        $("label[for='FullName']").hide();
+        $("#ID").hide();
+        $("label[for='ID']").hide();
+    }
+    function EditSelectedRow() {
+        var grid = $("#AuthorsGrid").data("kendoGrid");
+        grid.editRow(grid.select());
+    }
+    function DeleteSelectedRow(){
+        var grid = $("#AuthorsGrid").data("kendoGrid");
+        grid.removeRow(grid.select());
+    }
+    $(document).ready(function () {
+        var editb = document.getElementById("CustomEditButton");
+        var delb = document.getElementById("CustomDeleteButton");
+
+        var sp = document.createElement("span");
+        var sp2 = document.createElement("span");
+
+        sp.className = "glyphicon glyphicon-trash";
+        delb.appendChild(sp);
+        sp2.className = "glyphicon glyphicon-pencil";
+        editb.appendChild(sp2);
+
+        //var d = document.getElementsByClassName(".k-window-title");
+        //d[1].InnerHtml = "შენახვა";
+
+    });
+</script>

@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @*@Styles.Render("~/Content/themes/base/all.css")*@
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/Content/kendo/css")
+    @Scripts.Render("~/bundles/jquery")
+    @*@Scripts.Render("~/bundles/jqueryui")*@
+    @Scripts.Render("~/bundles/kendo")
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.RouteLink("მთავარი", "BookCatalog", null, new { @class = "navbar-brand", @style = "font-size:18px" })
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    @if (ViewBag.NavBarActive == "AuthorCatalog")
+                    {
+                        <li class="active">@Html.RouteLink("ავტორების კატალოგი", "AuthorCatalog")</li>
+                        <li>@Html.RouteLink("წიგნის კატეგორიების კატალოგი", "BookCategoryCatalog")</li>
+                        <li>@Html.RouteLink("წიგნების კატალოგი", "BookCatalog")</li>
+                        <li>@Html.RouteLink("სტატისტიკური მოდული", "Statistics")</li>
+                    }
+                    @if (ViewBag.NavBarActive == "BookCategoryCatalog")
+                    {
+                        <li>@Html.RouteLink("ავტორების კატალოგი", "AuthorCatalog")</li>
+                        <li class="active">@Html.RouteLink("წიგნის კატეგორიების კატალოგი", "BookCategoryCatalog")</li>
+                        <li>@Html.RouteLink("წიგნების კატალოგი", "BookCatalog")</li>
+                        <li>@Html.RouteLink("სტატისტიკური მოდული", "Statistics")</li>
+                    }
+                    @if (ViewBag.NavBarActive == "BookCatalog")
+                    {
+                        <li>@Html.RouteLink("ავტორების კატალოგი", "AuthorCatalog")</li>
+                        <li>@Html.RouteLink("წიგნის კატეგორიების კატალოგი", "BookCategoryCatalog")</li>
+                        <li class="active">@Html.RouteLink("წიგნების კატალოგი", "BookCatalog")</li>
+                        <li>@Html.RouteLink("სტატისტიკური მოდული", "Statistics")</li>
+                    }
+                    @if (ViewBag.NavBarActive == "Statistics")
+                    {
+                        <li>@Html.RouteLink("ავტორების კატალოგი", "AuthorCatalog")</li>
+                        <li>@Html.RouteLink("წიგნის კატეგორიების კატალოგი", "BookCategoryCatalog")</li>
+                        <li>@Html.RouteLink("წიგნების კატალოგი", "BookCatalog")</li>
+                        <li class="active">@Html.RouteLink("სტატისტიკური მოდული", "Statistics")</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div style="margin-left: 10px; margin-right: 10px; margin-top: 70px">
+        @RenderBody()
+        <hr />
+        <footer>
+            <center>
+                &copy; @DateTime.Now.Year - DVL Application
+            </center>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

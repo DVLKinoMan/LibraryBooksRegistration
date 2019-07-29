@@ -1,0 +1,154 @@
+﻿@model LibraryBooksRegistration.WebUI.Models.Add_EditBookViewModel
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+@*@Styles.Render("~/Content/themes/base/all.css")*@
+@Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/modernizr")
+@Styles.Render("~/Content/kendo/css")
+@Scripts.Render("~/bundles/jquery")
+@*@Scripts.Render("~/bundles/jqueryui")*@
+@Scripts.Render("~/bundles/kendo")
+
+@Html.Partial("Messages")
+@using (Ajax.BeginForm("Add_EditBook", "BookCatalog", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "DivForAdd_EditBook" }))
+{
+    @Html.AntiForgeryToken()
+   
+    <div class="container" id="DivForAdd_EditBook">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model=>model.Book.ID)
+        <div class="form-group">
+            @Html.LabelFor(model => model.Book.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Book.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Book.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Book.CategoryID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.Book.CategoryID, ViewBag.CategoriesForBooks as IEnumerable<SelectListItem>, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Book.CategoryID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Book.PublishingHouse, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Book.PublishingHouse, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Book.PublishingHouse, "", new { @class = "text-danger" })
+            </div>
+        </div>
+       
+        <div class="form-group">
+            @Html.LabelFor(model => model.Book.PublishingDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Book.PublishingDate, "{0:yyyy-MM-dd}", new { @type = "date" , @class = "form-control" } )
+                @Html.ValidationMessageFor(model => model.Book.PublishingDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        @*@(Html.Kendo().Grid(Model.BookAuthors)
+            .Name("AuthorsGrid")
+            .Columns(c =>
+            {
+                c.Bound(a => a.AuthorID).Hidden();
+                c.Bound(a => a.FullName);
+                c.Command(a => a.Destroy()).Width(150);
+            }
+            )
+            .ToolBar(toolBar =>
+            {
+                toolBar.Create();
+                toolBar.Save();
+            })
+            .Pageable()
+            .Sortable()
+            .Scrollable()
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .ServerOperation(false)
+                .Model(model =>
+                {
+                    model.Id(a => a.AuthorID);
+                    model.Field(a => a.FullName).DefaultValue(
+                        ViewBag.Authors as IEnumerable<LibraryBooksRegistration.WebUI.Models.BookAuthorViewModel>);
+                })
+                .PageSize(20)
+                .Create(create => create.Action("CreateAuthorBook", "BookCatalog"))
+                .Destroy(destroy => destroy.Action("DestroyAuthorBook", "BookCatalog"))
+            )
+        )*@
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>წიგნის ავტორები</th>
+                </tr>
+            </thead>
+            <tbody>
+                @*@Html.HiddenFor(m=>m.BookAuthors)*@
+                @for(var i=0; i<Model.BookAuthors.Count();i++)
+                {
+                    @Html.HiddenFor(m=>Model.BookAuthors[i].AuthorID)
+                    @Html.HiddenFor(m=>Model.BookAuthors[i].FullName)
+                    <tr>
+                        <td>@Model.BookAuthors[i].FullName</td>
+                        <td>
+                            <button type="submit" class="btn btn-warning" name="DeleteAuthorId" value="@Model.BookAuthors[i].AuthorID">წაშლა</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <table>
+            <tr>
+                <td>
+                    @Html.DropDownListFor(model => model.NewAuthorID, ViewBag.Authors as IEnumerable<SelectListItem>, new { @class = "form-control" })
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-primary" name="sbmbutton" value="AddAuthorForBook">წიგნის ავტორის დამატება</button>
+                </td>
+            </tr>
+        </table>
+        
+        <table>
+            <tr>
+                <td>
+                    <a class="btn btn-default" style="margin-right:10px" id="CloseWindowButton"><span class="glyphicon glyphicon-circle-arrow-left"></span> დახურვა</a>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-primary" name="sbmbutton" value="add_editbook">
+                        <i class="glyphicon glyphicon-save"></i> შენახვა
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+}
+<script>
+$(document).ready(function () {
+        var v = '@ViewBag.SubmitedSuccessful';
+        if(v){
+            var addb = window.parent.$("#AddBookPopUpWindow").data("kendoWindow");
+            var editb = window.parent.$("#EditBookPopUpWindow").data("kendoWindow");
+            if (addb)
+                addb.close();
+            if (editb)
+                editb.close();
+            var grid = window.parent.$("#BooksGrid").data("kendoGrid");
+            grid.dataSource.read();
+        }
+        })
+    $("#CloseWindowButton").on("click", function (e) {
+            var addb = window.parent.$("#AddBookPopUpWindow").data("kendoWindow");
+            var editb = window.parent.$("#EditBookPopUpWindow").data("kendoWindow");
+            if (addb)
+                addb.close();
+            if (editb)
+                editb.close();
+        })
+</script>
+
+@Scripts.Render("~/bundles/bootstrap")

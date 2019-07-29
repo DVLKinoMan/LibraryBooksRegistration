@@ -1,0 +1,168 @@
+﻿@{ 
+    ViewBag.Title = "წიგნის კატეგორიების კატალოგი";
+}
+
+<table style="width:100%">
+    <tr>
+        <td class="col-md-3">
+            <button class="k-button k-button-icontext k-grid-add" href="" id="OpenAddCategoryPopUp"><span class="k-icon k-i-add"></span>ახალი კატეგორიის დამატება</button>
+        </td>
+        <td class="col-md-7">
+            <button class="btn btn-primary pull-right" id="OpenEditCategoryPopUp"><span class="glyphicon glyphicon-pencil"></span> კატეგორიის რედაქტირება</button>
+        </td>
+        <td class="col-md-2">
+            <button class="btn btn-warning pull-right" id="OpenRemoveCategoryPopUp"><span class="glyphicon glyphicon-trash"></span> კატეგორიის წაშლა</button>
+        </td>
+    </tr>
+</table>   
+<table style="width:100%">
+    <tr>
+        <td class="col-md-3" valign="top">
+            @(Html.Kendo()
+                .TreeView()
+                .Name("BookCategoriesTreeView")
+                .DataTextField("Name")
+                .DataSource(datasource => datasource
+                    .Model
+                    (
+                        model => model.Id("CategoryID")
+                        .HasChildren("HasChildren")
+                    )
+                    .Read(read => read.Action("ReadCategories", "BookCategoryCatalog"))
+                )
+                .Events(e =>
+                    e.Select("ChangeDescription"))
+            )
+        </td>
+        <td class="col-md-9">
+            <label>კატეგორიის აღწერა:</label>
+            <textarea id="CategoryDescription" class="" style="max-width:100%; width:100%"  disabled="disabled" rows="10" cols="150"></textarea>
+        </td>
+    </tr>
+</table>   
+
+@(Html.Kendo().Window()
+        .Name("AddBookCategoryPopUpWindow")
+        .Visible(false)
+        .Modal(true)
+        .Width(400)
+        .Height(350)
+        .Title("წიგნის კატეგორიის დამატება")
+        .LoadContentFrom("AddBookCategory", "BookCategoryCatalog")
+        .Iframe(true)
+        .Resizable()
+        .Draggable()
+)
+@(Html.Kendo().Window()
+        .Name("EditBookCategoryPopUpWindow")
+        .Visible(false)
+        .Modal(true)
+        .Width(400)
+        .Height(350)
+        .Title("წიგნის კატეგორიის რედაქტირება")
+        .LoadContentFrom("EditBookCategory", "BookCategoryCatalog")
+        .Iframe(true)
+        .Resizable()
+        .Draggable()
+)
+@(Html.Kendo().Window()
+        .Name("DeleteBookCategoryPopUpWindow")
+        .Visible(false)
+        .Modal(true)
+        .Width(400)
+        .Height(350)
+        .Title("წიგნის კატეგორიის წაშლა")
+        .LoadContentFrom("DeleteBookCategory", "BookCategoryCatalog")
+        .Iframe(true)
+        .Resizable()
+        .Draggable()
+)
+
+@*<div id="dialog-confirm" style="display: none">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
+        Are you sure to delete ?
+    </p>
+</div>
+<div id="dialog-edit" style="display: none">
+</div>
+<div id="dialog-view" style="display: none">
+</div>*@
+<script>
+    function ChangeDescription(e) {
+        var data = $('#BookCategoriesTreeView').data('kendoTreeView').dataItem(e.node);
+        $('#CategoryDescription').val(data.Description);
+    }
+    function CollapseAllNodes() {
+        var data = $('#BookCategoriesTreeView').data('kendoTreeView');
+        data.collapse(".k-item");
+    }
+
+    $(document).ready(function () {
+        $("#OpenEditCategoryPopUp").on("click", function (e) {
+            var win = $("#EditBookCategoryPopUpWindow").data("kendoWindow");
+            var data = $('#BookCategoriesTreeView').data('kendoTreeView');
+
+            var selected = data.select();
+            var item = data.dataItem(selected);
+
+            if (item && item.CategoryID && item.CategoryID != -1) {
+                $('#CategoryDescription').val("");
+                //CollapseAllNodes();
+                var cat = item.CategoryID;
+                var url1 = '@Url.Action("EditBookCategory", "BookCategoryCatalog", new { CategoryID = "catt1" })';
+                win.refresh({
+                     url: url1.replace("catt1", cat)
+                });
+                win.center().open();
+            }
+        })
+        $("#OpenRemoveCategoryPopUp").on("click", function (e) {
+            var win = $("#DeleteBookCategoryPopUpWindow").data("kendoWindow");
+            var data = $('#BookCategoriesTreeView').data('kendoTreeView');
+
+            var selected = data.select();
+            var item = data.dataItem(selected);
+
+            if (item && item.CategoryID && item.CategoryID != -1) {
+                $('#CategoryDescription').val("");
+                //CollapseAllNodes();
+                var cat = item.CategoryID;
+                var url1 = '@Url.Action("DeleteBookCategory", "BookCategoryCatalog", new { CategoryID = "catt1" })';
+                win.refresh({
+                    url: url1.replace("catt1", cat)
+                });
+                win.center().open();
+            }
+        })
+        $("#OpenAddCategoryPopUp").on("click", function (e) {
+            var win = $("#AddBookCategoryPopUpWindow").data("kendoWindow");
+            var data = $('#BookCategoriesTreeView').data('kendoTreeView');
+
+            var selected = data.select();
+            var item = data.dataItem(selected);
+
+            if (item && item.CategoryID)
+            {
+                $('#CategoryDescription').val("");
+                //CollapseAllNodes();
+                var cat = item.CategoryID;
+                if (item.CategoryID != -1) {
+                    var url1 = '@Url.Action("AddBookCategory", "BookCategoryCatalog", new { CategoryID = "catt1" })';
+                    win.refresh({
+                        url: url1.replace("catt1",cat)
+                    });
+                }
+                else {
+                    win.refresh();
+                }
+                win.center().open();
+            }
+
+        })
+        $("#CloseWindowButton").on("click", function (e) {
+            var win = $("#AddBookCategoryPopUpWindow").data("kendoWindow");
+            win.close();
+        })
+        });
+ </script>
